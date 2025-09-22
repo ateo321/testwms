@@ -1,9 +1,0 @@
-# Railway Buildpacks configuration
-[[buildpacks]]
-uri = "heroku/nodejs"
-
-[build]
-buildCommand = "npm run build"
-
-[run]
-startCommand = "npm start"
