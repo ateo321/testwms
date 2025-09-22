@@ -1,0 +1,276 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Management
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  firstName String
+  lastName  String
+  password  String
+  role      UserRole @default(EMPLOYEE)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  createdOrders     Order[]       @relation("OrderCreatedBy")
+  assignedOrders    Order[]       @relation("OrderAssignedTo")
+  inventoryEntries  Inventory[]   @relation("InventoryCreatedBy")
+  activityLogs      ActivityLog[]
+  warehouseAccess   WarehouseUser[]
+
+  @@map("users")
+}
+
+model WarehouseUser {
+  id          String    @id @default(cuid())
+  userId      String
+  warehouseId String
+  role        String    // MANAGER, SUPERVISOR, PICKER, etc.
+  createdAt   DateTime  @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, warehouseId])
+  @@map("warehouse_users")
+}
+
+// Warehouse Structure
+model Warehouse {
+  id          String   @id @default(cuid())
+  name        String
+  address     String
+  city        String
+  state       String
+  zipCode     String
+  country     String   @default("US")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  zones         Zone[]
+  inventory     Inventory[]
+  orders        Order[]
+  users         WarehouseUser[]
+  activityLogs  ActivityLog[]
+
+  @@map("warehouses")
+}
+
+model Zone {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  warehouseId String
+  zoneType    ZoneType @default(STORAGE)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  warehouse Warehouse  @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  locations Location[]
+
+  @@map("zones")
+}
+
+model Location {
+  id          String      @id @default(cuid())
+  name        String
+  barcode     String?     @unique
+  zoneId      String
+  aisle       String?
+  shelf       String?
+  bin         String?
+  capacity    Int?
+  locationType LocationType @default(SHELF)
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  zone      Zone        @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  inventory Inventory[]
+
+  @@map("locations")
+}
+
+// Product & Inventory
+model Product {
+  id          String   @id @default(cuid())
+  sku         String   @unique
+  name        String
+  description String?
+  category    String?
+  brand       String?
+  weight      Float?
+  dimensions  String?  // JSON string for length, width, height
+  unitPrice   Float?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  inventory   Inventory[]
+  orderItems  OrderItem[]
+
+  @@map("products")
+}
+
+model Inventory {
+  id           String   @id @default(cuid())
+  productId    String
+  warehouseId  String
+  locationId   String
+  quantity     Int
+  reservedQty  Int      @default(0)
+  availableQty Int      // Computed: quantity - reservedQty
+  minStock     Int      @default(0)
+  maxStock     Int?
+  lastCountAt  DateTime?
+  createdById  String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  warehouse Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  location  Location  @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  createdBy User      @relation("InventoryCreatedBy", fields: [createdById], references: [id])
+
+  @@unique([productId, warehouseId, locationId])
+  @@map("inventory")
+}
+
+// Order Management
+model Order {
+  id            String      @id @default(cuid())
+  orderNumber   String      @unique
+  warehouseId   String
+  customerId    String?
+  customerName  String
+  customerEmail String?
+  status        OrderStatus @default(PENDING)
+  priority      Priority    @default(NORMAL)
+  orderType     OrderType   @default(OUTBOUND)
+  totalItems    Int         @default(0)
+  totalValue    Float       @default(0)
+  shippingAddress String?
+  notes         String?
+  createdById   String
+  assignedToId  String?
+  completedAt   DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  // Relations
+  warehouse  Warehouse   @relation(fields: [warehouseId], references: [id])
+  createdBy  User        @relation("OrderCreatedBy", fields: [createdById], references: [id])
+  assignedTo User?       @relation("OrderAssignedTo", fields: [assignedToId], references: [id])
+  items      OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id          String @id @default(cuid())
+  orderId     String
+  productId   String
+  quantity    Int
+  pickedQty   Int    @default(0)
+  unitPrice   Float?
+  totalPrice  Float?
+  notes       String?
+
+  // Relations
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+// Activity Logging
+model ActivityLog {
+  id          String       @id @default(cuid())
+  userId      String
+  warehouseId String?
+  action      String
+  entity      String       // Product, Order, Inventory, etc.
+  entityId    String
+  oldValues   String?      // JSON
+  newValues   String?      // JSON
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime     @default(now())
+
+  // Relations
+  user      User       @relation(fields: [userId], references: [id])
+  warehouse Warehouse? @relation(fields: [warehouseId], references: [id])
+
+  @@map("activity_logs")
+}
+
+// Enums
+enum UserRole {
+  ADMIN
+  MANAGER
+  SUPERVISOR
+  EMPLOYEE
+}
+
+enum ZoneType {
+  RECEIVING
+  STORAGE
+  PICKING
+  PACKING
+  SHIPPING
+  RETURNS
+}
+
+enum LocationType {
+  FLOOR
+  SHELF
+  RACK
+  BIN
+  PALLET
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  PICKING
+  PICKED
+  PACKING
+  PACKED
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum OrderType {
+  INBOUND
+  OUTBOUND
+  TRANSFER
+  ADJUSTMENT
+}
+
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
