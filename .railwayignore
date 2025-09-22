@@ -1,0 +1,22 @@
+# Railway ignore file - force package.json deployment
+# Ignore any deployment configs that might force Nixpacks
+
+nixpacks.toml
+Dockerfile*
+buildpacks.toml
+Procfile
+deploy.sh
+
+# Ignore development files
+node_modules
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.nyc_output
+coverage
+.DS_Store
+*.log
+.vscode
+.idea
