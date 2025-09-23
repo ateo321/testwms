@@ -12,6 +12,7 @@ import inventoryRoutes from './routes/inventory';
 import warehouseRoutes from './routes/warehouse';
 import orderRoutes from './routes/orders';
 import reportRoutes from './routes/reports';
+import seedRoutes from './routes/seed';
 
 // Load environment variables
 dotenv.config();
@@ -50,6 +51,7 @@ app.use('/api/inventory', inventoryRoutes);
 app.use('/api/warehouse', warehouseRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/seed', seedRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {
