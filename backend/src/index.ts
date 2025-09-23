@@ -26,7 +26,21 @@ const PORT = parseInt(process.env.PORT || '5000', 10);
 export const prisma = new PrismaClient();
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'", "https:"],
+      fontSrc: ["'self'", "data:"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'"],
+      frameSrc: ["'none'"],
+    },
+  },
+}));
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true,
@@ -55,10 +69,23 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/seed', seedRoutes);
 
 // Serve static files from frontend build
-app.use(express.static(path.join(__dirname, '../out')));
+app.use(express.static(path.join(__dirname, '../out'), {
+  maxAge: '1d',
+  etag: true,
+  lastModified: true,
+  setHeaders: (res, path) => {
+    if (path.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript');
+    }
+    if (path.endsWith('.css')) {
+      res.setHeader('Content-Type', 'text/css');
+    }
+  }
+}));
 
 // Serve frontend for all non-API routes
 app.get('*', (req, res) => {
+  res.setHeader('Content-Type', 'text/html');
   res.sendFile(path.join(__dirname, '../out/index.html'));
 });
 
