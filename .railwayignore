@@ -1,6 +1,7 @@
-# Railway ignore file - force package.json deployment
-# Ignore any deployment configs that might force Nixpacks
+# Railway ignore file - Force package.json deployment
+# Ignore any files that might trigger Nixpacks
 
+# Ignore deployment configs that might force Nixpacks
 nixpacks.toml
 Dockerfile*
 buildpacks.toml
@@ -20,3 +21,10 @@ coverage
 *.log
 .vscode
 .idea
+
+# Ignore backend-specific configs that might interfere
+backend/nixpacks.toml
+backend/railway.json
+backend/Dockerfile*
+backend/buildpacks.toml
+backend/Procfile
