@@ -1,0 +1,16 @@
+[phases.setup]
+nixPkgs = ["nodejs-18_x"]
+
+[phases.install]
+cmds = [
+  "echo 'Checking package files...'",
+  "ls -la package*.json",
+  "echo 'Installing dependencies...'",
+  "if [ -f package-lock.json ]; then npm ci; else npm install; fi"
+]
+
+[phases.build]
+cmds = ["npm run build"]
+
+[start]
+cmd = "npm start"
