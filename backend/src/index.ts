@@ -63,6 +63,106 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Add more test data endpoint
+app.post('/api/seed-more', async (req, res) => {
+  try {
+    console.log('🌱 Adding more test data for pagination testing...');
+
+    // Get existing data
+    const existingWarehouse = await prisma.warehouse.findFirst();
+    const existingZone = await prisma.zone.findFirst();
+    const existingLocation = await prisma.location.findFirst();
+    const existingAdmin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
+
+    if (!existingWarehouse || !existingZone || !existingLocation || !existingAdmin) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Missing required data. Please run /api/seed first.'
+      });
+    }
+
+    const bcrypt = require('bcryptjs');
+    const faker = require('@faker-js/faker');
+
+    // Add 50 more users
+    console.log('👥 Adding 50 more users...');
+    const users = [];
+    for (let i = 0; i < 50; i++) {
+      const firstName = faker.person.firstName();
+      const lastName = faker.person.lastName();
+      const email = faker.internet.email({ firstName, lastName });
+      const username = faker.internet.username({ firstName, lastName });
+      const role = faker.helpers.arrayElement(['EMPLOYEE', 'SUPERVISOR', 'MANAGER', 'ADMIN']);
+      const hashedPassword = await bcrypt.hash('password123', 10);
+
+      users.push({
+        firstName,
+        lastName,
+        email,
+        username,
+        password: hashedPassword,
+        role,
+        isActive: faker.datatype.boolean(0.9),
+      });
+    }
+
+    const createdUsers = await prisma.user.createMany({
+      data: users,
+      skipDuplicates: true,
+    });
+
+    console.log(`✅ Created ${createdUsers.count} users`);
+
+    // Add 5 more warehouses
+    console.log('🏢 Adding 5 more warehouses...');
+    const warehouses = [];
+    for (let i = 0; i < 5; i++) {
+      warehouses.push({
+        name: faker.company.name() + ' Warehouse',
+        address: faker.location.streetAddress(),
+        city: faker.location.city(),
+        state: faker.location.state(),
+        zipCode: faker.location.zipCode(),
+        country: 'US',
+        isActive: true,
+      });
+    }
+
+    const createdWarehouses = await prisma.warehouse.createMany({
+      data: warehouses,
+      skipDuplicates: true,
+    });
+
+    console.log(`✅ Created ${createdWarehouses.count} warehouses`);
+
+    // Get final counts
+    const finalCounts = {
+      totalUsers: await prisma.user.count(),
+      totalWarehouses: await prisma.warehouse.count(),
+      totalProducts: await prisma.product.count(),
+      totalInventory: await prisma.inventory.count(),
+      totalOrders: await prisma.order.count(),
+    };
+
+    console.log('🎉 More test data added successfully!');
+    console.log('📊 Final counts:', finalCounts);
+
+    res.json({
+      status: 'success',
+      message: 'More test data added successfully!',
+      data: finalCounts
+    });
+
+  } catch (error) {
+    console.error('❌ Error adding more test data:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to add more test data',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
 // Simple seed endpoint for database population
 app.post('/api/seed', async (req, res) => {
   try {
