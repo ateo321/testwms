@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import path from 'path';
 import { PrismaClient } from '@prisma/client';
 
 // Import routes
@@ -53,12 +54,12 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/seed', seedRoutes);
 
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({
-    status: 'error',
-    message: 'Route not found'
-  });
+// Serve static files from frontend build
+app.use(express.static(path.join(__dirname, '../../frontend/out')));
+
+// Serve frontend for all non-API routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../frontend/out/index.html'));
 });
 
 // Global error handler
