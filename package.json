@@ -5,9 +5,9 @@
   "main": "backend/dist/index.js",
   "scripts": {
     "start": "cd backend && npm start",
-    "build": "cd frontend && npm run build && cp -r out ../backend/ && cd ../backend && npm run build",
+    "build": "cd frontend && npx next build --turbopack && cp -r out ../backend/ && cd ../backend && npm run build",
     "dev": "cd backend && npm run dev",
-    "build:frontend": "cd frontend && npm run build",
+    "build:frontend": "cd frontend && npx next build --turbopack",
     "build:backend": "cd backend && npm run build"
   },
   "engines": {
