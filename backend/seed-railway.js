@@ -115,21 +115,27 @@ async function seed() {
         priority: 'NORMAL',
         customerName: 'John Doe',
         customerEmail: 'john@example.com',
-        totalAmount: 99.99,
+        totalValue: 99.99,
+        totalItems: 1,
         createdById: admin.id,
         warehouseId: warehouse.id,
-        orderItems: {
-          create: {
-            productId: product.id,
-            quantity: 1,
-            unitPrice: 99.99,
-            totalPrice: 99.99,
-          },
-        },
       },
     });
 
     console.log('✅ Order created:', order.orderNumber);
+
+    // Create order item
+    const orderItem = await prisma.orderItem.create({
+      data: {
+        orderId: order.id,
+        productId: product.id,
+        quantity: 1,
+        unitPrice: 99.99,
+        totalPrice: 99.99,
+      },
+    });
+
+    console.log('✅ Order item created:', orderItem.id);
 
     console.log('🎉 Database seeded successfully!');
     console.log('📧 Admin login: admin@wms.com / password123');
