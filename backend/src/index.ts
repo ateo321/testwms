@@ -64,20 +64,11 @@ app.get('/api/health', (req, res) => {
 });
 
 // Force add pagination data endpoint
-app.post('/api/seed-pagination', async (req, res) => {
+app.post('/api/force-seed', async (req, res) => {
   try {
     console.log('🌱 Force adding pagination test data...');
 
     const bcrypt = require('bcryptjs');
-
-    // Get existing admin user
-    const admin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
-    if (!admin) {
-      return res.status(400).json({
-        status: 'error',
-        message: 'No admin user found. Please run /api/seed first.'
-      });
-    }
 
     // Add 50 more users for pagination testing
     console.log('👥 Adding 50 more users...');
