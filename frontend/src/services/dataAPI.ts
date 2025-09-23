@@ -1,4 +1,5 @@
 import api from './api';
+import { ApiResponse } from '@/types';
 
 export interface PaginationParams {
   page?: number;
@@ -59,11 +60,11 @@ export const dataAPI = {
   // Users API
   users: {
     getAll: async (params?: PaginationParams) => {
-      const response = await api.get('/users', { params });
+      const response = await api.get<ApiResponse<{ users: any[]; pagination: any }>>('/users', { params });
       return response.data;
     },
     getById: async (id: string) => {
-      const response = await api.get(`/users/${id}`);
+      const response = await api.get<ApiResponse<{ user: any }>>(`/users/${id}`);
       return response.data;
     },
   },
@@ -71,11 +72,11 @@ export const dataAPI = {
   // Inventory API
   inventory: {
     getAll: async (params?: PaginationParams) => {
-      const response = await api.get('/inventory', { params });
+      const response = await api.get<ApiResponse<{ inventory: any[]; pagination: any }>>('/inventory', { params });
       return response.data;
     },
     getById: async (id: string) => {
-      const response = await api.get(`/inventory/${id}`);
+      const response = await api.get<ApiResponse<{ inventory: any }>>(`/inventory/${id}`);
       return response.data;
     },
   },
@@ -83,11 +84,11 @@ export const dataAPI = {
   // Orders API
   orders: {
     getAll: async (params?: PaginationParams) => {
-      const response = await api.get('/orders', { params });
+      const response = await api.get<ApiResponse<{ orders: any[]; pagination: any }>>('/orders', { params });
       return response.data;
     },
     getById: async (id: string) => {
-      const response = await api.get(`/orders/${id}`);
+      const response = await api.get<ApiResponse<{ order: any }>>(`/orders/${id}`);
       return response.data;
     },
   },

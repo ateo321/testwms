@@ -264,7 +264,7 @@ export default function ReportsPage() {
 
   return (
     <Layout>
-      <Box>
+      <Box sx={{ height: '100%', minHeight: '100%' }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
           <Typography variant="h4">Reports & Analytics</Typography>
           <Box display="flex" gap={2}>
@@ -346,7 +346,7 @@ export default function ReportsPage() {
 
         {/* Key Metrics */}
         {metrics && (
-          <Grid container spacing={3} sx={{ mb: 4 }}>
+          <Grid container spacing={3} sx={{ mb: 4, position: 'relative', zIndex: 1 }}>
             <Grid item xs={12} sm={6} md={3}>
               <Card>
                 <CardContent>
@@ -436,7 +436,7 @@ export default function ReportsPage() {
 
         {/* Charts and Visualizations */}
         {metrics && (
-          <Grid container spacing={3} sx={{ mb: 4 }}>
+          <Grid container spacing={3} sx={{ mb: 4, position: 'relative', zIndex: 1 }}>
             {/* Revenue Trend Chart */}
             <Grid item xs={12} md={8}>
               <Card>
@@ -609,10 +609,10 @@ export default function ReportsPage() {
         )}
 
         {/* Reports Content */}
-        <Grid container spacing={3}>
+        <Grid container spacing={3} sx={{ position: 'relative', zIndex: 1 }}>
           {/* Top Selling Products */}
           <Grid item xs={12} md={6}>
-            <Card>
+            <Card sx={{ position: 'relative', zIndex: 1 }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
                   Top Selling Products
@@ -643,7 +643,7 @@ export default function ReportsPage() {
 
           {/* Warehouse Performance */}
           <Grid item xs={12} md={6}>
-            <Card>
+            <Card sx={{ position: 'relative', zIndex: 1 }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
                   Warehouse Performance
@@ -676,7 +676,7 @@ export default function ReportsPage() {
 
           {/* Order Status Distribution */}
           <Grid item xs={12} md={6}>
-            <Card>
+            <Card sx={{ position: 'relative', zIndex: 1 }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
                   Order Status Distribution
@@ -720,7 +720,7 @@ export default function ReportsPage() {
 
           {/* Inventory Alerts */}
           <Grid item xs={12} md={6}>
-            <Card>
+            <Card sx={{ position: 'relative', zIndex: 1 }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
                   Inventory Alerts

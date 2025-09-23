@@ -206,24 +206,64 @@ export default function Layout({ children }: LayoutProps) {
         sx={{
           width: { lg: `calc(100% - ${drawerWidth}px)` },
           ml: { lg: `${drawerWidth}px` },
-          background: 'rgba(255, 255, 255, 0.1)',
+          background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9) 0%, rgba(139, 92, 246, 0.9) 100%)',
           backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+          border: '1px solid rgba(255, 255, 255, 0.3)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15)',
           zIndex: 1100, // Lower than Snackbar (9999) but higher than drawer (1000)
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.2) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.2) 0%, transparent 50%)',
+            pointerEvents: 'none',
+            zIndex: -1,
+          },
         }}
       >
-        <Toolbar>
+        <Toolbar sx={{
+          position: 'relative',
+          zIndex: 2,
+          '&::after': {
+            content: '""',
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: '1px',
+            background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%)',
+          },
+        }}>
           <IconButton
             color="inherit"
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { lg: 'none' } }}
+            sx={{ 
+              mr: 2, 
+              display: { lg: 'none' },
+              color: '#ffffff',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              },
+            }}
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, color: '#ffffff' }}>
+          <Typography 
+            variant="h6" 
+            noWrap 
+            component="div" 
+            sx={{ 
+              flexGrow: 1, 
+              color: '#ffffff',
+              fontWeight: 600,
+              textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+            }}
+          >
             Warehouse Management System
           </Typography>
           <IconButton
@@ -233,11 +273,14 @@ export default function Layout({ children }: LayoutProps) {
             aria-haspopup="true"
             onClick={handleMenuClick}
             sx={{
-              background: 'rgba(255, 255, 255, 0.1)',
+              background: 'rgba(255, 255, 255, 0.15)',
               backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              color: '#ffffff',
               '&:hover': {
-                background: 'rgba(255, 255, 255, 0.2)',
+                background: 'rgba(255, 255, 255, 0.25)',
+                transform: 'scale(1.05)',
+                transition: 'all 0.2s ease',
               },
             }}
           >
@@ -358,9 +401,12 @@ export default function Layout({ children }: LayoutProps) {
         sx={{
           flexGrow: 1,
           p: 3,
-          width: { lg: `calc(100% - ${drawerWidth}px)` },// Full viewport height
+          width: { lg: `calc(100% - ${drawerWidth}px)` },
+          height: { lg: '100vh' }, // Full viewport height
+          marginTop: { lg: '64px' }, // Account for AppBar height
           background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
           position: 'relative',
+          overflow: 'auto', // Allow scrolling if content exceeds viewport
           '&::before': {
             content: '""',
             position: 'absolute',
@@ -377,7 +423,7 @@ export default function Layout({ children }: LayoutProps) {
           position: 'relative', 
           zIndex: 1, 
           height: '100%',
-          paddingTop: { lg: '64px' }, // Account for AppBar height
+          minHeight: '100%', // Ensure minimum height
         }}>
           {children}
         </Box>

@@ -1,6 +1,12 @@
 import axios from 'axios';
 import { ApiResponse, AuthResponse, LoginForm, RegisterForm } from '@/types';
 
+// Pagination interface
+export interface PaginationParams {
+  page?: number;
+  limit?: number;
+}
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://testwms-production.up.railway.app/api';
 
 // Create axios instance
@@ -65,9 +71,9 @@ export const authAPI = {
 
 // Users API
 export const usersAPI = {
-  getAll: async () => {
-    const response = await api.get<ApiResponse<{ users: any[] }>>('/users');
-    return response.data.data!.users;
+  getAll: async (params?: PaginationParams) => {
+    const response = await api.get<ApiResponse<{ users: any[]; pagination: any }>>('/users', { params });
+    return response.data;
   },
 
   getById: async (id: string) => {
@@ -88,9 +94,9 @@ export const usersAPI = {
 
 // Warehouses API
 export const warehousesAPI = {
-  getAll: async () => {
-    const response = await api.get<ApiResponse<{ warehouses: any[] }>>('/warehouse');
-    return response.data.data!.warehouses;
+  getAll: async (params?: PaginationParams) => {
+    const response = await api.get<ApiResponse<{ warehouses: any[]; pagination: any }>>('/warehouse', { params });
+    return response.data;
   },
 
   create: async (data: any) => {
@@ -101,9 +107,9 @@ export const warehousesAPI = {
 
 // Inventory API
 export const inventoryAPI = {
-  getAll: async (params?: any) => {
-    const response = await api.get<ApiResponse<{ inventory: any[] }>>('/inventory', { params });
-    return response.data.data!.inventory;
+  getAll: async (params?: PaginationParams) => {
+    const response = await api.get<ApiResponse<{ inventory: any[]; pagination: any }>>('/inventory', { params });
+    return response.data;
   },
 
   getById: async (id: string) => {
@@ -129,9 +135,9 @@ export const inventoryAPI = {
 
 // Orders API
 export const ordersAPI = {
-  getAll: async (params?: any) => {
-    const response = await api.get<ApiResponse<{ orders: any[] }>>('/orders', { params });
-    return response.data.data!.orders;
+  getAll: async (params?: PaginationParams) => {
+    const response = await api.get<ApiResponse<{ orders: any[]; pagination: any }>>('/orders', { params });
+    return response.data;
   },
 
   getById: async (id: string) => {

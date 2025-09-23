@@ -82,7 +82,7 @@ const recentActivities = [
 export default function DashboardPage() {
   return (
     <Layout>
-      <Box>
+      <Box sx={{ height: '100%', minHeight: '100%' }}>
         <Typography variant="h4" gutterBottom>
           Dashboard
         </Typography>
