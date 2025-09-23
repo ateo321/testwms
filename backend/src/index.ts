@@ -63,6 +63,157 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Force add pagination data endpoint
+app.post('/api/seed-pagination', async (req, res) => {
+  try {
+    console.log('🌱 Force adding pagination test data...');
+
+    const bcrypt = require('bcryptjs');
+
+    // Get existing admin user
+    const admin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
+    if (!admin) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'No admin user found. Please run /api/seed first.'
+      });
+    }
+
+    // Add 50 more users for pagination testing
+    console.log('👥 Adding 50 more users...');
+    const users = [];
+    for (let i = 0; i < 50; i++) {
+      const firstName = `User${i + 1}`;
+      const lastName = `Test${i + 1}`;
+      const email = `user${i + 1}@test.com`;
+      const username = `user${i + 1}`;
+      const role = (['EMPLOYEE', 'SUPERVISOR', 'MANAGER', 'ADMIN'] as const)[i % 4];
+      const userHashedPassword = await bcrypt.hash('password123', 10);
+
+      users.push({
+        firstName,
+        lastName,
+        email,
+        username,
+        password: userHashedPassword,
+        role,
+        isActive: Math.random() > 0.1, // 90% active
+      });
+    }
+
+    const createdUsers = await prisma.user.createMany({
+      data: users,
+      skipDuplicates: true,
+    });
+
+    console.log(`✅ Created ${createdUsers.count} additional users`);
+
+    // Add 5 more warehouses
+    console.log('🏢 Adding 5 more warehouses...');
+    const warehouses = [
+      {
+        name: 'North Warehouse',
+        address: '123 North St',
+        city: 'New York',
+        state: 'NY',
+        zipCode: '10001',
+        country: 'US',
+        isActive: true,
+      },
+      {
+        name: 'South Warehouse',
+        address: '456 South Ave',
+        city: 'Los Angeles',
+        state: 'CA',
+        zipCode: '90210',
+        country: 'US',
+        isActive: true,
+      },
+      {
+        name: 'East Warehouse',
+        address: '789 East Blvd',
+        city: 'Chicago',
+        state: 'IL',
+        zipCode: '60601',
+        country: 'US',
+        isActive: true,
+      },
+      {
+        name: 'West Warehouse',
+        address: '321 West St',
+        city: 'Houston',
+        state: 'TX',
+        zipCode: '77001',
+        country: 'US',
+        isActive: true,
+      },
+      {
+        name: 'Central Warehouse',
+        address: '654 Central Ave',
+        city: 'Phoenix',
+        state: 'AZ',
+        zipCode: '85001',
+        country: 'US',
+        isActive: true,
+      }
+    ];
+
+    const createdWarehouses = await prisma.warehouse.createMany({
+      data: warehouses,
+      skipDuplicates: true,
+    });
+
+    console.log(`✅ Created ${createdWarehouses.count} additional warehouses`);
+
+    // Add 50 more products
+    console.log('📦 Adding 50 more products...');
+    const products = [];
+    for (let i = 0; i < 50; i++) {
+      const categories = ['Electronics', 'Clothing', 'Books', 'Home', 'Sports', 'Toys', 'Automotive', 'Health'];
+      products.push({
+        name: `Product ${i + 1}`,
+        sku: `SKU-${String(i + 1).padStart(3, '0')}`,
+        description: `Description for product ${i + 1}`,
+        category: categories[i % categories.length],
+        unitPrice: Math.floor(Math.random() * 1000) + 10,
+      });
+    }
+
+    const createdProducts = await prisma.product.createMany({
+      data: products,
+      skipDuplicates: true,
+    });
+
+    console.log(`✅ Created ${createdProducts.count} additional products`);
+
+    // Get final counts
+    const finalCounts = {
+      totalUsers: await prisma.user.count(),
+      totalWarehouses: await prisma.warehouse.count(),
+      totalProducts: await prisma.product.count(),
+      totalInventory: await prisma.inventory.count(),
+      totalOrders: await prisma.order.count(),
+    };
+
+    console.log('🎉 Pagination test data added successfully!');
+    console.log('📊 Final counts:', finalCounts);
+
+    res.json({
+      status: 'success',
+      message: 'Pagination test data added successfully!',
+      data: finalCounts
+    });
+
+  } catch (error) {
+    console.error('❌ Error adding pagination data:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to add pagination data',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
 // Add more test data endpoint
 app.post('/api/seed-more', async (req, res) => {
   try {
