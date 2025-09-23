@@ -55,11 +55,11 @@ app.use('/api/reports', reportRoutes);
 app.use('/api/seed', seedRoutes);
 
 // Serve static files from frontend build
-app.use(express.static(path.join(__dirname, '../../frontend/out')));
+app.use(express.static(path.join(__dirname, '../out')));
 
 // Serve frontend for all non-API routes
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../../frontend/out/index.html'));
+  res.sendFile(path.join(__dirname, '../out/index.html'));
 });
 
 // Global error handler
