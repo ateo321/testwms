@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { ApiResponse, AuthResponse, LoginForm, RegisterForm } from '@/types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://testwms-production.up.railway.app/api';
 
 // Create axios instance
 const api = axios.create({
