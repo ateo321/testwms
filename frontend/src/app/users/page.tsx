@@ -620,7 +620,13 @@ export default function UsersPage() {
           open={snackbar.open}
           autoHideDuration={4000}
           onClose={() => setSnackbar({ ...snackbar, open: false })}
-          sx={{ zIndex: 9999 }}
+          sx={{ 
+            zIndex: 999999,
+            position: 'fixed',
+            '& .MuiSnackbarContent-root': {
+              zIndex: 999999,
+            }
+          }}
         >
           <Alert
             onClose={() => setSnackbar({ ...snackbar, open: false })}

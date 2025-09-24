@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Remember Me Functionality</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Remember Me Functionality Test</h1>
+        
+        <div class="test-section">
+            <h3>📧 Email Remember Test</h3>
+            <p>Test saving and loading email address:</p>
+            <input type="email" id="emailInput" placeholder="Enter email address" />
+            <button onclick="saveEmail()">Save Email</button>
+            <button onclick="loadEmail()">Load Email</button>
+            <button onclick="clearEmail()">Clear Email</button>
+            <div id="emailResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔐 Token Expiration Test</h3>
+            <p>Test token expiration functionality:</p>
+            <button onclick="setToken(24)">Set Token (24 hours)</button>
+            <button onclick="setToken(0.1)">Set Token (6 minutes)</button>
+            <button onclick="checkExpiration()">Check Expiration</button>
+            <button onclick="clearToken()">Clear Token</button>
+            <div id="tokenResult"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>💾 Local Storage Status</h3>
+            <button onclick="showStorage()">Show Storage</button>
+            <button onclick="clearStorage()">Clear All</button>
+            <div id="storageResult"></div>
+        </div>
+    </div>
+
+    <script>
+        // Email remember functionality
+        function saveEmail() {
+            const email = document.getElementById('emailInput').value;
+            if (email) {
+                localStorage.setItem('rememberedEmail', email);
+                showResult('emailResult', `✅ Email saved: ${email}`, 'success');
+            } else {
+                showResult('emailResult', '❌ Please enter an email', 'error');
+            }
+        }
+
+        function loadEmail() {
+            const email = localStorage.getItem('rememberedEmail');
+            if (email) {
+                document.getElementById('emailInput').value = email;
+                showResult('emailResult', `✅ Email loaded: ${email}`, 'success');
+            } else {
+                showResult('emailResult', '❌ No email found in storage', 'error');
+            }
+        }
+
+        function clearEmail() {
+            localStorage.removeItem('rememberedEmail');
+            document.getElementById('emailInput').value = '';
+            showResult('emailResult', '✅ Email cleared', 'success');
+        }
+
+        // Token expiration functionality
+        function setToken(hours) {
+            const expirationTime = Date.now() + (hours * 60 * 60 * 1000);
+            localStorage.setItem('tokenExpiration', expirationTime.toString());
+            localStorage.setItem('rememberMe', 'true');
+            localStorage.setItem('token', 'test-token-123');
+            localStorage.setItem('user', JSON.stringify({name: 'Test User', email: 'test@example.com'}));
+            
+            const expirationDate = new Date(expirationTime);
+            showResult('tokenResult', `✅ Token set to expire in ${hours} hours (${expirationDate.toLocaleString()})`, 'success');
+        }
+
+        function checkExpiration() {
+            const expirationTime = localStorage.getItem('tokenExpiration');
+            if (expirationTime) {
+                const now = Date.now();
+                const expiration = parseInt(expirationTime);
+                const isExpired = now > expiration;
+                
+                if (isExpired) {
+                    showResult('tokenResult', '❌ Token is EXPIRED', 'error');
+                    // Simulate clearing auth
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('tokenExpiration');
+                    localStorage.removeItem('rememberMe');
+                } else {
+                    const remaining = Math.ceil((expiration - now) / (1000 * 60 * 60));
+                    showResult('tokenResult', `✅ Token is valid for ${remaining} more hours`, 'success');
+                }
+            } else {
+                showResult('tokenResult', '❌ No token found', 'error');
+            }
+        }
+
+        function clearToken() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            localStorage.removeItem('tokenExpiration');
+            localStorage.removeItem('rememberMe');
+            showResult('tokenResult', '✅ Token cleared', 'success');
+        }
+
+        // Storage management
+        function showStorage() {
+            const storage = {
+                rememberedEmail: localStorage.getItem('rememberedEmail'),
+                token: localStorage.getItem('token'),
+                user: localStorage.getItem('user'),
+                tokenExpiration: localStorage.getItem('tokenExpiration'),
+                rememberMe: localStorage.getItem('rememberMe')
+            };
+            
+            const result = Object.entries(storage)
+                .map(([key, value]) => `${key}: ${value || 'null'}`)
+                .join('<br>');
+            
+            showResult('storageResult', `<pre>${result}</pre>`, 'success');
+        }
+
+        function clearStorage() {
+            localStorage.clear();
+            showResult('storageResult', '✅ All storage cleared', 'success');
+        }
+
+        function showResult(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = message;
+            element.className = type;
+        }
+
+        // Auto-load email on page load
+        window.onload = function() {
+            loadEmail();
+        };
+    </script>
+</body>
+</html>
