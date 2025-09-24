@@ -33,7 +33,7 @@ import {
   Logout,
 } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 
 const drawerWidth = 280;
@@ -57,7 +57,12 @@ export default function Layout({ children }: LayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const router = useRouter();
-  const { user, clearAuth } = useAuthStore();
+  const { user, clearAuth, checkTokenExpiration } = useAuthStore();
+
+  // Check token expiration on component mount
+  useEffect(() => {
+    checkTokenExpiration();
+  }, [checkTokenExpiration]);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
