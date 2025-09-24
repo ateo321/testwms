@@ -503,10 +503,13 @@ export default function OrdersPage() {
           autoHideDuration={4000}
           onClose={() => setSnackbar({ ...snackbar, open: false })}
           sx={{ 
-            zIndex: 999999,
-            position: 'fixed',
+            zIndex: 9999999,
+            position: 'fixed !important',
             '& .MuiSnackbarContent-root': {
-              zIndex: 999999,
+              zIndex: 9999999,
+            },
+            '& .MuiAlert-root': {
+              zIndex: 9999999,
             }
           }}
         >

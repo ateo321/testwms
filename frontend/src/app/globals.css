@@ -24,3 +24,19 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Ensure snackbars always appear on top */
+.MuiSnackbar-root {
+  z-index: 9999999 !important;
+  position: fixed !important;
+}
+
+.MuiSnackbarContent-root {
+  z-index: 9999999 !important;
+  position: relative !important;
+}
+
+.MuiAlert-root {
+  z-index: 9999999 !important;
+  position: relative !important;
+}

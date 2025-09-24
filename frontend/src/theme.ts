@@ -263,14 +263,14 @@ const theme = createTheme({
     MuiSnackbar: {
       styleOverrides: {
         root: {
-          zIndex: 999999, // Much higher z-index to ensure snackbar appears above everything
+          zIndex: 9999999, // Extremely high z-index to ensure snackbar appears above everything
           position: 'fixed !important',
           '& .MuiSnackbarContent-root': {
-            zIndex: 999999,
+            zIndex: 9999999,
             position: 'relative',
           },
           '& .MuiAlert-root': {
-            zIndex: 999999,
+            zIndex: 9999999,
             position: 'relative',
           },
         },
